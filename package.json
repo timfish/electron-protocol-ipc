@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "@foxify/events": "^2.0.1",
+    "events": "^3.3.0",
     "can-ndjson-stream": "^1.0.2"
   }
 }

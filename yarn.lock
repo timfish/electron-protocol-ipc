@@ -338,11 +338,6 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@foxify/events@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@foxify/events/-/events-2.0.1.tgz#cb83f65ad92b3a108332ad3cc35e3007d9b682a1"
-  integrity sha512-12igRYG92ceEqNvGOw6HDUqkvsafk7DRdY7SS06zhcHPSE0+GKcEczLoC94TAQd7aDpqUpg8788rDJ3ck+/DaA==
-
 "@gar/promisify@^1.0.1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.2.tgz#30aa825f11d438671d585bd44e7fd564535fc210"
@@ -2379,7 +2374,7 @@ eventemitter3@^4.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
-events@^3.2.0:
+events@^3.2.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==

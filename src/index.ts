@@ -7,9 +7,11 @@ const ipc = new IpcMain();
 
 ipc.on("media-devices", console.log);
 
+ipc.handle("gpu-info", () => app.getGPUInfo("basic"));
+
 setInterval(() => {
   ipc.send("metrics", app.getAppMetrics());
-}, 5000);
+}, 4000);
 
 if (require("electron-squirrel-startup")) {
   // eslint-disable-line global-require
@@ -26,7 +28,9 @@ const createWindow = (): void => {
   mainWindow.webContents.openDevTools();
 };
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

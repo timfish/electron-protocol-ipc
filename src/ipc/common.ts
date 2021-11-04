@@ -1,8 +1,14 @@
 export interface Options {
-  scheme?: string;
+  scheme: string;
 }
 
 export interface IPCEvent {
   channel: string;
-  value: unknown[];
+  values: unknown[];
+}
+
+export enum IPCURL {
+  StreamFromMain = "stream-from-main",
+  SendToMain = "send-to-main",
+  InvokeOnMain = "invoke-on-main",
 }

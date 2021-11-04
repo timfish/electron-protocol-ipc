@@ -10,3 +10,7 @@ setInterval(async () => {
     await window.navigator.mediaDevices.enumerateDevices()
   );
 }, 5000);
+
+setTimeout(async () => {
+  console.log(await ipc.invoke("gpu-info"));
+}, 3000);
