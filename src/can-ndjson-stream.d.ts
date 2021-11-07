@@ -1,4 +1,4 @@
-declare module "can-ndjson-stream" {
+declare module 'can-ndjson-stream' {
   function ndjsonStream<T>(
     stream: ReadableStream<Uint8Array> | null
   ): ReadableStream<T>;

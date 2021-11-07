@@ -87,3 +87,7 @@ typings/
 
 # Electron-Forge
 out/
+
+*.js
+*.d.ts
+*.map

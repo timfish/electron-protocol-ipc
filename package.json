@@ -1,68 +1,50 @@
 {
   "name": "electron-protocol-ipc",
   "productName": "electron-protocol-ipc",
-  "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": ".webpack/main",
-  "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+  "version": "0.0.1",
+  "description": "Experimental Inter-Process Communication for Electron via a custom protocol with similar features to the Electron ipcMain and ipcRenderer APIs",
+  "main": "./index.js",
+  "browser": "./renderer.js",
+  "exports": {
+    ".": "./index.js",
+    "./main": "./main.js",
+    "./renderer": "./renderer.js"
   },
-  "keywords": [],
+  "types": "./index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "cd test && npm start",
+    "lint": "eslint --ext .ts ."
+  },
+  "keywords": [
+    "electron",
+    "ipc",
+    "protocol"
+  ],
   "author": {
     "name": "Tim Fish",
     "email": "tim@timfish.uk"
   },
-  "license": "MIT",
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack.main.config.js",
-            "renderer": {
-              "config": "./webpack.renderer.config.js",
-              "entryPoints": [
-                {
-                  "html": "./src/index.html",
-                  "js": "./src/renderer.ts",
-                  "name": "main_window"
-                }
-              ]
-            }
-          }
-        ]
-      ]
-    }
+  "homepage": "https://github.com/timfish/electron-protocol-ipc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timfish/electron-protocol-ipc.git"
   },
+  "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.61",
-    "@electron-forge/maker-deb": "^6.0.0-beta.61",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
-    "@electron-forge/maker-zip": "^6.0.0-beta.61",
-    "@electron-forge/plugin-webpack": "6.0.0-beta.61",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
-    "@vercel/webpack-asset-relocator-loader": "1.7.0",
-    "css-loader": "^6.0.0",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
     "electron": "15.3.0",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
-    "fork-ts-checker-webpack-plugin": "^6.0.1",
-    "node-loader": "^2.0.0",
-    "style-loader": "^3.0.0",
-    "ts-loader": "^9.2.2",
-    "typescript": "^4.0.2"
+    "prettier": "2.4.1",
+    "typescript": "^4.4.4"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
-    "events": "^3.3.0",
-    "can-ndjson-stream": "^1.0.2"
-  }
+    "can-ndjson-stream": "^1.0.2",
+    "events": "^3.3.0"
+  },
+  "workspaces": [
+    "./test"
+  ]
 }
