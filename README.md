@@ -1,11 +1,12 @@
 # `electron-protocol-ipc` 💫
 
-Experimental Inter-Process Communication for Electron via a custom protocol.
+Experimental Inter-Process Communication for Electron via a custom protocol with
+similar features to the Electron `ipcMain` and `ipcRenderer` APIs.
 
 With Electron's recommended configuration of `nodeIntegration: false`, a preload
-script is required to expose IPC between the main and renderers. If you're also
-using the recommended `contextIsolation: true`, you'll need to expose the IPC in
-the preload via `contextBridge`.
+script is required to expose IPC between the main and renderer precesses. If
+you're also using the recommended `contextIsolation: true`, you'll need to
+expose the IPC in the preload via `contextBridge`.
 
 Although this is relatively painless when you've done it a few times, it is not
 trivial for newcomers.
@@ -14,9 +15,6 @@ If you maintain a JavaScript library that communicates between the
 Electron main and renderer processes, your users need to understand the
 process architecture and preload scripts to get your library working which
 creates a barrier to entry,
-
-This library supplies a similar interface to the Electron `ipcMain` and
-`ipcRenderer` APIs.
 
 ## How it Works
 
@@ -36,6 +34,8 @@ This library supplies a similar interface to the Electron `ipcMain` and
 - Messages can be seen in dev tools network tab
 - JSON serialisation not great for binary data
 - `IpcMain` needs to be created before `app` `ready` event fires
+
+## Example
 
 `main.js`
 
