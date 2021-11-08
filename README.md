@@ -23,12 +23,13 @@ creates a barrier to entry,
 - `invoke` from renderer and `handle` in the main is via JSON `fetch` with JSON response
 - `send` from main to renderer is handled by keeping a stream open (initiated
   from the renderer) and sending newline-delimited JSON from the main process
+- Forward messages to renderers when `destination` is set
 
 ## 👍
 
 - Preload no longer required
+- Renderer code is just regular browser code
 - Messages can be seen in dev tools network tab
-- Send messages between named renderers
 
 ## 👎
 
