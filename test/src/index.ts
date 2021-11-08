@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import { IpcMain } from '../../main';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const SECOND_WINDOW_WEBPACK_ENTRY: string;
 
 const ipc = new IpcMain();
 
@@ -18,18 +19,19 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = (): void => {
+const createWindow = (url: string): void => {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
   });
 
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.loadURL(url);
   mainWindow.webContents.openDevTools();
 };
 
 app.on('ready', () => {
-  createWindow();
+  createWindow(MAIN_WINDOW_WEBPACK_ENTRY);
+  createWindow(SECOND_WINDOW_WEBPACK_ENTRY);
 });
 
 app.on('window-all-closed', () => {
@@ -40,6 +42,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createWindow(MAIN_WINDOW_WEBPACK_ENTRY);
   }
 });

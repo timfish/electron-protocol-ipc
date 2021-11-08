@@ -6,6 +6,8 @@ export interface Options {
 
 export interface IPCEvent {
   channel: string;
+  source: string | undefined;
+  destination: string | undefined;
   values: unknown[];
 }
 

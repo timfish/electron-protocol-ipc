@@ -1,4 +1,4 @@
-# `electron-protocol-ipc` 💫
+# 💫 `electron-protocol-ipc`
 
 Experimental Inter-Process Communication for Electron via a custom protocol with
 similar features to the Electron `ipcMain` and `ipcRenderer` APIs.
@@ -28,6 +28,7 @@ creates a barrier to entry,
 
 - Preload no longer required
 - Messages can be seen in dev tools network tab
+- Send messages between named renderers
 
 ## 👎
 
@@ -50,7 +51,7 @@ import { IpcMain } from 'electron-protocol-ipc/main';
 const ipc = new IpcMain();
 
 // Subscribe to a channel
-ipc.on('media-devices', (devices) => console.log(devices));
+ipc.on('media-devices', (sender, devices) => console.log(sender, devices));
 
 // Handle `invoke` from a renderer
 ipc.handle('gpu-info', () => app.getGPUInfo('basic'));
@@ -74,7 +75,7 @@ import { IpcRenderer } from 'electron-protocol-ipc/renderer';
 const ipc = new IpcRenderer({ streamFromMain: true });
 
 // Subscribe to a channel
-ipc.on('metrics', (metrics) => console.log(metrics));
+ipc.on('metrics', (sender, metrics) => console.log(sender, metrics));
 
 // Regularly send media device list
 setInterval(async () => {
@@ -85,4 +86,23 @@ setInterval(async () => {
 }, 5000);
 
 const gupInfo = await ipc.invoke('gpu-info');
+
+// Send random numbers to second renderer
+// This goes via the main process
+setInterval(() => {
+  ipc.sendTo('random-numbers', 'second', Math.random());
+}, 200);
+```
+
+`second-renderer.js`
+
+```js
+import { IpcRenderer } from 'electron-protocol-ipc';
+
+// If we name a renderer, we can send to it from other
+// renderers with sendTo
+const ipc = new IpcRenderer({ name: 'second', streamFromMain: true });
+
+// Subscribe to a channel
+ipc.on('random-numbers', (_, num) => console.log('New number:', num));
 ```

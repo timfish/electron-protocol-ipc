@@ -14,9 +14,22 @@ const defaultOptions: MainOptions & Options = {
   warnNoRenderers: true,
 };
 
+function createStream(output?: string | null): Readable {
+  return new Readable({
+    read() {
+      if (typeof output === 'string') {
+        this.push(output);
+        this.push(null);
+      } else if (output === null) {
+        this.push(null);
+      }
+    },
+  });
+}
+
 export class IpcMain extends EventEmitter {
   private readonly options: MainOptions;
-  private readonly rendererStreams: Readable[] = [];
+  private readonly renderers = new ListeningRenderers();
   private readonly handlers: {
     [key: string]: (...args: unknown[]) => Promise<unknown>;
   } = {};
@@ -29,7 +42,15 @@ export class IpcMain extends EventEmitter {
   }
 
   public send(channel: string, ...values: unknown[]): void {
-    if (this.options.warnNoRenderers && this.rendererStreams.length === 0) {
+    this.sendTo(channel, undefined, ...values);
+  }
+
+  public sendTo(
+    channel: string,
+    destination: string | undefined,
+    ...values: unknown[]
+  ): void {
+    if (this.options.warnNoRenderers && !this.renderers.hasListeners) {
       console.warn(`No renderers are listening!
 
 Main to renderer messages are disabled by default. Enable in the renderer:
@@ -40,12 +61,12 @@ To disable this warning:
 `);
     }
 
-    const msg: IPCEvent = { channel, values };
-    const json = JSON.stringify(msg) + '\n';
-
-    for (const renderer of this.rendererStreams) {
-      renderer.push(json);
-    }
+    this.renderers.dispatch({
+      channel,
+      source: 'main',
+      destination,
+      values,
+    });
   }
 
   public handle<T>(
@@ -55,15 +76,8 @@ To disable this warning:
     this.handlers[channel] = handler;
   }
 
-  public removeHandle(channel: string): void {
+  public unHandle(channel: string): void {
     delete this.handlers[channel];
-  }
-
-  private removeRenderer(readable: Readable): void {
-    const index = this.rendererStreams.indexOf(readable);
-    if (index >= 0) {
-      this.rendererStreams.splice(index, 1);
-    }
   }
 
   private async setupProtocol(): Promise<void> {
@@ -94,46 +108,80 @@ To disable this warning:
     request: Electron.ProtocolRequest,
     callback: (response: NodeJS.ReadableStream | ProtocolResponse) => void
   ) {
-    const stream = new Readable({
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      read() {},
-    });
+    const data = request.uploadData?.[0]?.bytes.toString();
 
-    if (request.url === `${this.options.scheme}://${IpcURL.SendToMain}`) {
-      const json = request.uploadData?.[0]?.bytes.toString();
+    if (
+      data &&
+      request.url === `${this.options.scheme}://${IpcURL.SendToMain}`
+    ) {
+      const msg = JSON.parse(data) as IPCEvent;
 
-      if (json) {
-        const msg = JSON.parse(json) as IPCEvent;
-        this.emit(msg.channel, ...msg.values);
-        stream.push(null);
-        callback({ statusCode: 200, data: stream });
+      if (msg.destination) {
+        this.renderers.dispatch(msg);
       }
+
+      this.emit(msg.channel, msg.source, ...msg.values);
+
+      callback({ statusCode: 200, data: createStream(null) });
     } else if (
+      data &&
       request.url === `${this.options.scheme}://${IpcURL.InvokeOnMain}`
     ) {
-      const json = request.uploadData?.[0]?.bytes.toString();
+      const msg = JSON.parse(data) as IPCEvent;
+      const handler = this.handlers[msg.channel];
 
-      if (json) {
-        const msg = JSON.parse(json) as IPCEvent;
-        const handler = this.handlers[msg.channel];
-        if (handler) {
-          const result = await handler(...msg.values);
-          stream.push(JSON.stringify(result));
-          stream.push(null);
-          callback({ statusCode: 200, data: stream });
-        } else {
-          stream.push(null);
-          callback({ statusCode: 404, data: stream });
-        }
+      if (handler) {
+        const result = await handler(...msg.values);
+        callback({
+          statusCode: 200,
+          data: createStream(JSON.stringify(result)),
+        });
+      } else {
+        callback({ statusCode: 404, data: createStream(null) });
       }
     } else if (
+      data &&
       request.url === `${this.options.scheme}://${IpcURL.StreamFromMain}`
     ) {
-      stream.on('close', () => this.removeRenderer(stream));
-      stream.on('error', () => this.removeRenderer(stream));
-      this.rendererStreams.push(stream);
+      const { source } = JSON.parse(data) as { source: string };
 
-      callback({ statusCode: 200, data: stream });
+      callback({ statusCode: 200, data: this.renderers.add(source) });
+    }
+  }
+}
+
+class ListeningRenderers {
+  private readonly renderers: [string | undefined, Readable][] = [];
+
+  public add(source: string | undefined): Readable {
+    const stream = createStream();
+
+    stream.on('close', () => this.remove(stream));
+    stream.on('error', () => this.remove(stream));
+
+    this.renderers.push([source, stream]);
+
+    return stream;
+  }
+
+  public get hasListeners(): boolean {
+    return this.renderers.length > 0;
+  }
+
+  public dispatch(msg: IPCEvent) {
+    const json = JSON.stringify(msg) + '\n';
+
+    for (const [name, stream] of this.renderers) {
+      if (msg.destination == undefined || msg.destination === name) {
+        stream.push(json);
+      }
+    }
+  }
+
+  private remove(stream: Readable) {
+    const index = this.renderers.findIndex(([, s]) => s === stream);
+    if (index >= 0) {
+      this.renderers.splice(index, 1);
     }
   }
 }

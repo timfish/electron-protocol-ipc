@@ -24,8 +24,21 @@ export class IpcRenderer extends EventEmitter {
     }
   }
 
-  public send(channel: string, ...value: unknown[]): void {
-    const msg: IPCEvent = { channel, values: value };
+  public send(channel: string, ...values: unknown[]): void {
+    this.sendTo(channel, undefined, ...values);
+  }
+
+  public sendTo(
+    channel: string,
+    destination: string | undefined,
+    ...value: unknown[]
+  ): void {
+    const msg: IPCEvent = {
+      channel,
+      source: this.options.name,
+      destination,
+      values: value,
+    };
 
     fetch(`${this.options.scheme}://${IpcURL.SendToMain}`, {
       method: 'POST',
@@ -34,7 +47,12 @@ export class IpcRenderer extends EventEmitter {
   }
 
   public async invoke<T>(channel: string, ...value: unknown[]): Promise<T> {
-    const msg: IPCEvent = { channel, values: value };
+    const msg: IPCEvent = {
+      channel,
+      source: this.options.name,
+      destination: undefined,
+      values: value,
+    };
 
     return fetch(`${this.options.scheme}://${IpcURL.InvokeOnMain}`, {
       method: 'POST',
@@ -43,7 +61,14 @@ export class IpcRenderer extends EventEmitter {
   }
 
   private async streamFromMain(): Promise<void> {
-    fetch(`${this.options.scheme}://${IpcURL.StreamFromMain}`)
+    const msg = {
+      source: this.options.name,
+    };
+
+    fetch(`${this.options.scheme}://${IpcURL.StreamFromMain}`, {
+      method: 'POST',
+      body: JSON.stringify(msg),
+    })
       .then((response) => ndjsonStream<IPCEvent>(response.body))
       .then((jsonStream) => {
         const reader = jsonStream.getReader();
@@ -54,7 +79,11 @@ export class IpcRenderer extends EventEmitter {
           if (result.done) {
             this.streamFromMain();
           } else {
-            this.emit(result.value.channel, ...result.value.values);
+            this.emit(
+              result.value.channel,
+              result.value.source,
+              ...result.value.values
+            );
             handleRead();
           }
         };

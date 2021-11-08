@@ -11,6 +11,10 @@ setInterval(async () => {
   );
 }, 5000);
 
+setInterval(async () => {
+  ipc.sendTo('random-numbers', 'second', Math.random());
+}, 200);
+
 setTimeout(async () => {
   console.log(await ipc.invoke('gpu-info'));
 }, 3000);
