@@ -1,7 +1,7 @@
 {
   "name": "electron-protocol-ipc",
   "productName": "electron-protocol-ipc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Experimental Inter-Process Communication for Electron via a custom protocol with similar features to the Electron ipcMain and ipcRenderer APIs",
   "main": "./index.js",
   "browser": "./renderer.js",

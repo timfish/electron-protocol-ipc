@@ -120,7 +120,9 @@ To disable this warning:
         this.renderers.dispatch(msg);
       }
 
-      this.emit(msg.channel, msg.source, ...msg.values);
+      if (msg.destination === undefined || msg.destination === 'main') {
+        this.emit(msg.channel, msg.source, ...msg.values);
+      }
 
       callback({ statusCode: 200, data: createStream(null) });
     } else if (
