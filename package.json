@@ -1,7 +1,7 @@
 {
   "name": "electron-protocol-ipc",
   "productName": "electron-protocol-ipc",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Experimental Inter-Process Communication for Electron via a custom protocol with similar features to the Electron ipcMain and ipcRenderer APIs",
   "main": "./index.js",
   "browser": "./renderer.js",
@@ -34,11 +34,11 @@
   "devDependencies": {
     "@types/node": "^16.11.6",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
-    "electron": "15.3.0",
+    "electron": "21.2.0",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
     "prettier": "2.4.1",
-    "typescript": "^4.4.4"
+    "typescript": "^4.8.4"
   },
   "dependencies": {
     "can-ndjson-stream": "^1.0.2",

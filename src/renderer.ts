@@ -3,12 +3,14 @@ import { IPCEvent, Options, IpcURL, DEFAULT_SCHEME } from './common';
 import ndjsonStream from 'can-ndjson-stream';
 
 export interface RendererOptions extends Options {
-  name?: string;
-  streamFromMain?: boolean;
+  name: string;
+  streamFromMain: boolean;
 }
 
 const defaultOptions: RendererOptions = {
   scheme: DEFAULT_SCHEME,
+  streamFromMain: false,
+  name: crypto.randomUUID(),
 };
 
 export class IpcRenderer extends EventEmitter {

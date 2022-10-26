@@ -153,9 +153,9 @@ To disable this warning:
 }
 
 class ListeningRenderers {
-  private readonly renderers: [string | undefined, Readable][] = [];
+  private readonly renderers: [string, Readable][] = [];
 
-  public add(source: string | undefined): Readable {
+  public add(source: string): Readable {
     const stream = createStream();
 
     stream.on('close', () => this.remove(stream));
